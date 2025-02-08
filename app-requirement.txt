@@ -1,0 +1,10 @@
+* As a user, I should be welcomed to the application called "mashonisa" and presented with a menu of actions I could take, supported by the application.
+* As a user, I should be prompted to enter enough details to CRUD a agent
+* As a user, I should be prompted to enter enough details to CRUD a client
+* As a user, I should be prompted to enter enough details to CRUD a loan for the added client
+* As a user, I should be prompted to enter enough details to CRUD a loan_repayment for a given client
+* As a user, I should be able to enter as many loans as I want for a client either during the time of creating the client or at some time in the future
+* As a user, I should be able to get all the "active" loan details for all the clients, grouped by client. These loans should also be grouped by month e.g. "JANUARY 2025 LOANS"
+* As a user, I should be able to get all "active" loan details for a given client
+* As a user, I should be able to get details about how much a specific client is still owing and how much they've paid so far
+* As a user, I should be able to gracefully exit the application and should be given confirmation that the application exited gracefully (e.g. "Bye")
