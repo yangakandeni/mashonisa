@@ -25,7 +25,7 @@ create_loan_repayment_table($dbh);
 # setup triggers
 calculate_amount_due_with_interest_sql_trigger($dbh);
 update_loan_status_sql_trigger($dbh);
-# prevent_overpayment_sql_trigger($dbh);
+prevent_overpayment_sql_trigger($dbh);
 
 
 $dbh->disconnect();
@@ -123,12 +123,12 @@ sub update_loan_status_sql_trigger ($dbh) {
         CREATE TRIGGER IF NOT EXISTS update_loan_status
         AFTER INSERT ON loan_repayment
         BEGIN
-            -- Check if the total repayments for the loan equal the current balance
-            IF (SELECT SUM(amount_paid) FROM loan_repayment WHERE client_id = NEW.client_id) >= (SELECT sum(amount_due) FROM loan WHERE client_id = NEW.client_id) THEN
-                UPDATE loan
-                SET loan_status = 'paid'
-                WHERE client_id = NEW.client_id;
-            END IF;
+            UPDATE loan
+            SET
+                loan_status = CASE WHEN (SELECT SUM(amount_paid) FROM loan_repayment WHERE client_id = NEW.client_id) >= (SELECT SUM(amount_due) FROM loan WHERE client_id = NEW.client_id) THEN 'paid'
+                ELSE loan_status
+                END
+            WHERE client_id = NEW.client_id;
         END;
     );
 
@@ -140,12 +140,10 @@ sub prevent_overpayment_sql_trigger ($dbh) {
     my $stmt_prevent_overpayment_trigger = qq(
         CREATE TRIGGER IF NOT EXISTS prevent_overpayment
         BEFORE INSERT ON loan_repayment
+        FOR EACH ROW
+        WHEN (SELECT SUM(amount_paid) + NEW.amount_paid FROM loan_repayment WHERE client_id = NEW.client_id ) > (SELECT SUM(amount_due) FROM loan WHERE client_id = NEW.client_id)
         BEGIN
-            -- Check if the payment would result in overpayment
-            IF (SELECT SUM(amount_paid) FROM loan_repayment WHERE client_id = NEW.client_id) > (SELECT sum(amount_due) FROM loan WHERE client_id = NEW.client_id) THEN
-                -- Raise an exception to prevent the insertion
-                RAISE(FAIL, 'Payment exceeds the total amount due.');
-            END IF;
+            SELECT RAISE(ABORT, 'Payment exceeds the total amount due');
         END;
     );
 
