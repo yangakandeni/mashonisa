@@ -28,6 +28,16 @@ DISTRIBUTIONS
       Class::Data::Inheritable 0.10
     requirements:
       ExtUtils::MakeMaker 0
+  Class-Inspector-1.36
+    pathname: P/PL/PLICEASE/Class-Inspector-1.36.tar.gz
+    provides:
+      Class::Inspector 1.36
+      Class::Inspector::Functions 1.36
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Spec 0.80
+      base 0
+      perl 5.008
   DBI-1.647
     pathname: H/HM/HMBRAND/DBI-1.647.tgz
     provides:
@@ -172,6 +182,14 @@ DISTRIBUTIONS
       perl 5.008001
       strict 0
       warnings 0
+  ExtUtils-CChecker-0.12
+    pathname: P/PE/PEVANS/ExtUtils-CChecker-0.12.tar.gz
+    provides:
+      ExtUtils::CChecker 0.12
+    requirements:
+      ExtUtils::CBuilder 0
+      Module::Build 0.4004
+      perl 5.014
   ExtUtils-Config-0.010
     pathname: L/LE/LEONT/ExtUtils-Config-0.010.tar.gz
     provides:
@@ -211,6 +229,31 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       File::Spec 0
       perl 5.008
+      strict 0
+      warnings 0
+  File-ShareDir-1.118
+    pathname: R/RE/REHSACK/File-ShareDir-1.118.tar.gz
+    provides:
+      File::ShareDir 1.118
+    requirements:
+      Carp 0
+      Class::Inspector 1.12
+      ExtUtils::MakeMaker 0
+      File::ShareDir::Install 0.13
+      File::Spec 0.80
+      perl 5.008001
+      warnings 0
+  File-ShareDir-Install-0.14
+    pathname: E/ET/ETHER/File-ShareDir-Install-0.14.tar.gz
+    provides:
+      File::ShareDir::Install 0.14
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      IO::Dir 0
+      perl 5.006
       strict 0
       warnings 0
   Module-Build-0.4234
@@ -347,6 +390,17 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
+  Syntax-Keyword-Try-0.30
+    pathname: P/PE/PEVANS/Syntax-Keyword-Try-0.30.tar.gz
+    provides:
+      Syntax::Keyword::Try 0.30
+      Syntax::Keyword::Try::Deparse 0.30
+    requirements:
+      ExtUtils::CBuilder 0
+      Module::Build 0.4004
+      XS::Parse::Keyword 0.35
+      XS::Parse::Keyword::Builder 0.35
+      perl 5.014
   Test-Deep-1.204
     pathname: R/RJ/RJBS/Test-Deep-1.204.tar.gz
     provides:
@@ -471,3 +525,17 @@ DISTRIBUTIONS
       Exporter 0
       ExtUtils::MakeMaker 0
       perl 5.006
+  XS-Parse-Keyword-0.48
+    pathname: P/PE/PEVANS/XS-Parse-Keyword-0.48.tar.gz
+    provides:
+      XS::Parse::Infix 0.48
+      XS::Parse::Infix::Builder 0.48
+      XS::Parse::Keyword 0.48
+      XS::Parse::Keyword::Builder 0.48
+    requirements:
+      ExtUtils::CBuilder 0
+      ExtUtils::CChecker 0.11
+      ExtUtils::ParseXS 3.16
+      File::ShareDir 1.00
+      Module::Build 0.4004
+      perl 5.014
