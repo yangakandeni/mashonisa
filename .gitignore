@@ -1,2 +1,4 @@
 local/
 .vscode/
+share/mashonisa-schema/*
+share/mashonisa-schema.db
