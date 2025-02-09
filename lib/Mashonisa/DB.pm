@@ -8,23 +8,41 @@ use DBI;
 use Mouse;
 use lib 'lib';
 
-# Define database connection parameters
-my $driver = "SQLite";
-my $database = "../mashonisa.db";
-my $dsn = "DBI:$driver:dbname=$database";
+has driver => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'SQLite',
+);
 
-sub connect ($self,$dsn) {
+has database_file => (
+    is => 'ro',
+    isa => 'Str',
+    default => '../mashonisa.db',
+);
+
+has dsn => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => sub ($self) {
+
+        my $driver = $self->driver;
+        my $database = $self->database_file;
+        return "DBI:$driver:dbname=$database";
+    }
+);
+
+sub connect ($self) {
 
     # Connect to the database without username/password for SQLite
-    my $dbh = DBI->connect($dsn, "", "", { RaiseError => 1 }) or die $DBI::errstr;
+    my $dbh = DBI->connect($self->dsn, "", "", { RaiseError => 1 }) or die $DBI::errstr;
 
     say "Opened database successfully";
 
     return $dbh;
 }
 
-sub disconnect {
-    my ($self,$dbh) = @_;
+sub disconnect ($self,$dbh) {
 
     if (defined($dbh)) {
 
