@@ -5,6 +5,10 @@ use Test::Most;
 
 use_ok('Mashonisa');
 
+no warnings;
+*Mashonisa::DB::database_file = sub { './test.db' };
+use warnings;
+
 isa_ok( my $Mashonisa = Mashonisa->new, 'Mashonisa' );
 
 eq_or_diff_text
