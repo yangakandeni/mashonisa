@@ -1,7 +1,11 @@
 requires "DBI";
 requires "Mouse";
 requires "Test::Most";
+requires "DBIx::Class";
 requires "Mouse::Role";
 requires "experimental";
 requires "perl", "5.38.3";
 requires "Syntax::Keyword::Try";
+requires "DBIx::Class::Factory";
+requires "DBIx::Class::Migration";
+requires "DBIx::Class::ResultSet::HashRef";

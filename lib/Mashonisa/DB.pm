@@ -32,42 +32,53 @@ has dsn => (
     }
 );
 
-sub connect ($self) {
+has schema => (
+    is => 'ro',
+    isa => 'Mashonisa::Schema',
+    lazy => 1,
+    default => sub ($self) {
 
-    # Connect to the database without username/password for SQLite
-    my $dbh = DBI->connect($self->dsn, "", "", { RaiseError => 1 }) or die $DBI::errstr;
-
-    say "Opened database successfully";
-
-    return $dbh;
-}
-
-sub disconnect ($self,$dbh) {
-
-    if (defined($dbh)) {
-
-        # Commit any pending transactions if AutoCommit is off
-        if (!$dbh->{AutoCommit}) {
-            eval {
-                # Try committing; ignore errors since we're about to disconnect anyway.
-                local ($@);
-                $dbh->commit();
-            };
-        }
-
-        # Disconnect from the database
-        eval {
-            local ($@);
-            undef($dbh);  # Disconnects when handle goes out of scope.
-        };
-
-        return 1;
-
-    } else {
-        return 0;
+        require Mashonisa::Schema;
+        return Mashonisa::Schema->connect($self->dsn, "", "", { RaiseError => 1 })
     }
+);
 
-    return undef;
-}
+# sub schema ($self) {
+
+#     # Connect to the database without username/password for SQLite
+#     my $dbh = Mashonisa::Schema->connect($self->dsn, "", "", { RaiseError => 1 }) or die $DBI::errstr;
+
+#     say "Opened database successfully";
+
+#     return $dbh;
+# }
+
+# # sub disconnect ($self,$dbh) {
+
+# #     if (defined($dbh)) {
+
+# #         # Commit any pending transactions if AutoCommit is off
+# #         if (!$dbh->{AutoCommit}) {
+# #             eval {
+# #                 # Try committing; ignore errors since we're about to disconnect anyway.
+# #                 local ($@);
+# #                 $dbh->commit();
+# #             };
+# #         }
+
+# #         # Disconnect from the database
+# #         eval {
+# #             local ($@);
+# #             undef($dbh);  # Disconnects when handle goes out of scope.
+# #         };
+
+# #         return 1;
+
+# #     } else {
+# #         return 0;
+# #     }
+
+# #     return undef;
+# # }
 
 1;
