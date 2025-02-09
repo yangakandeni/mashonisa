@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 use Mouse;
+with qw/ Mashonisa::Role::DB /;
+
 use lib 'lib';
+use Syntax::Keyword::Try;
 use experimental qw/ signatures say /;
 
 use Mashonisa::DB;
@@ -32,6 +35,26 @@ sub main_menu ($self) {
     19. View Client Balance
     20. Exit
     /;
+}
+
+sub add_agent ($self, $agent_name) {
+
+    try {
+
+        my $dbh = $self->db->connect;
+        my $sth = $dbh->prepare("INSERT INTO agent (name) VALUES (?)");
+
+        $sth->execute($agent_name);
+        say "Agent added successfully!";
+
+        return 1;
+
+    } catch ( $error ) {
+        warn sprintf("Failed to add agent - %s - on the database: $error", $agent_name);
+        return 0;
+    }
+
+    return 1;
 }
 
 1;

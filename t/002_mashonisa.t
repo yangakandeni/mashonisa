@@ -13,6 +13,13 @@ eq_or_diff_text
     'Got expected menu options'
 ;
 
+subtest 'CRUD - agent' => sub {
+
+    subtest 'add new agent' => sub {
+        is $Mashonisa->add_agent('Agent1'), 1, "Agent added successfully!";
+    };
+};
+
 done_testing;
 
 sub menu_options {
