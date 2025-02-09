@@ -17,25 +17,29 @@ sub run_app {
 
     while (1) {
         my $selection = get_selected_option();
-        if ($selection == 1) { add_agent(); }
-        # elsif ($selection == 2) { view_agents(); }
-        # elsif ($selection == 3) { update_agent(); }
-        # elsif ($selection == 4) { delete_agent(); }
-        # elsif ($selection == 5) { add_client(); }
-        # elsif ($selection == 6) { view_clients(); }
-        # elsif ($selection == 7) { update_client(); }
-        # elsif ($selection == 8) { delete_client(); }
-        # elsif ($selection == 9) { add_loan(); }
-        # elsif ($selection == 10) { view_loans(); }
-        # elsif ($selection == 11) { update_loan(); }
-        # elsif ($selection == 12) { delete_loan(); }
-        # elsif ($selection == 13) { add_loan_repayment(); }
-        # elsif ($selection == 14) { view_loan_repayments(); }
-        # elsif ($selection == 15) { update_loan_repayment(); }
-        # elsif ($selection == 16) { delete_loan_repayment(); }
-        # elsif ($selection == 17) { view_active_loans_grouped(); }
-        # elsif ($selection == 18) { view_active_loans_client(); }
-        # elsif ($selection == 19) { view_client_balance(); }
+        if ($selection == 1) {
+            print "Enter agent name: ";
+            chomp(my $name = <STDIN>);
+            Mashonisa->add_agent($name);
+        }
+        # elsif ($selection == 2) { Mashonisa->view_agents(); }
+        # elsif ($selection == 3) { Mashonisa->update_agent(); }
+        # elsif ($selection == 4) { Mashonisa->delete_agent(); }
+        # elsif ($selection == 5) { Mashonisa->add_client(); }
+        # elsif ($selection == 6) { Mashonisa->view_clients(); }
+        # elsif ($selection == 7) { Mashonisa->update_client(); }
+        # elsif ($selection == 8) { Mashonisa->delete_client(); }
+        # elsif ($selection == 9) { Mashonisa->add_loan(); }
+        # elsif ($selection == 10) { Mashonisa->view_loans(); }
+        # elsif ($selection == 11) { Mashonisa->update_loan(); }
+        # elsif ($selection == 12) { Mashonisa->delete_loan(); }
+        # elsif ($selection == 13) { Mashonisa->add_loan_repayment(); }
+        # elsif ($selection == 14) { Mashonisa->view_loan_repayments(); }
+        # elsif ($selection == 15) { Mashonisa->update_loan_repayment(); }
+        # elsif ($selection == 16) { Mashonisa->delete_loan_repayment(); }
+        # elsif ($selection == 17) { Mashonisa->view_active_loans_grouped(); }
+        # elsif ($selection == 18) { Mashonisa->view_active_loans_client(); }
+        # elsif ($selection == 19) { Mashonisa->view_client_balance(); }
         elsif ($selection == 20) {
             say "Bye!\n";
             last;
