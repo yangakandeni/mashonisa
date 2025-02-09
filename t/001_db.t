@@ -7,19 +7,23 @@ use_ok('Mashonisa::DB');
 
 isa_ok( my $DB = Mashonisa::DB->new, 'Mashonisa::DB' );
 
-my $driver = "SQLite";
-my $database = "test.db";
-my $dsn = "DBI:$driver:dbname=$database";
+no warnings;
+*Mashonisa::DB::database_file = sub { './test.db' };
+use warnings;
+
+is $DB->driver, 'SQLite', 'Got expected database driver';
+is $DB->dsn, 'DBI:SQLite:dbname=./test.db', 'Got expected database dsn';
+is $DB->database_file, './test.db', 'Got expected path to test database file';
 
 subtest 'can connect to database' => sub {
 
-    my $dbh = $DB->connect($dsn);
+    my $dbh = $DB->connect;
     is ref $dbh, 'DBI::db', 'Opened database successfully';
 };
 
 subtest 'can disconnect from database' => sub {
 
-    my $dbh = $DB->connect($dsn);
+    my $dbh = $DB->connect;
 
     subtest 'can disconnect successfully' => sub {
         is $DB->disconnect($dbh), 1, 'Disconnected successfully';
