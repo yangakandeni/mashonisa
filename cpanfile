@@ -5,6 +5,7 @@ requires "DBIx::Class";
 requires "Mouse::Role";
 requires "experimental";
 requires "perl", "5.38.3";
+requires "Test::DBIx::Class";
 requires "Syntax::Keyword::Try";
 requires "DBIx::Class::Factory";
 requires "DBIx::Class::Migration";
