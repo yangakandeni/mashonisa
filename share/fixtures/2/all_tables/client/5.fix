@@ -1,0 +1,8 @@
+$HASH1 = {
+           agent_id
+                  => 2,
+           created_at
+                  => '2025-02-10 19:57:40',
+           id     => 5,
+           name   => 'Client22'
+         };
