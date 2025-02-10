@@ -27,7 +27,7 @@ __PACKAGE__->add_columns(
     },
     created_at => {
         type => 'datetime',
-        default_value => { -function => 'CURRENT_TIMESTAMP' },
+        default_value => \'CURRENT_TIMESTAMP',
     },
 );
 
