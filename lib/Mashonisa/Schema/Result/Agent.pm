@@ -20,10 +20,20 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         is_unique => 1,
     },
+    interest_rate_id => {
+        data_type => 'integer',
+        is_foreign_key => 1,
+        is_nullable => 0,
+    },
 );
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
+
+__PACKAGE__->has_one(
+    'interest_rate' => 'Mashonisa::Schema::Result::InterestRate',
+    { 'foreign.id' => 'self.interest_rate_id' },
+);
 
 __PACKAGE__->has_many(
     'clients' => 'Mashonisa::Schema::Result::Client',
