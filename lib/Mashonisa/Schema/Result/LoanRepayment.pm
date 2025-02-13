@@ -25,6 +25,7 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         is_numeric => 1,
         size => [ 9, 2 ],
+        default_value => 0,
     },
     payment_date => {
         type => 'datetime',
