@@ -18,7 +18,7 @@ has driver => (
 has database_file => (
     is => 'ro',
     isa => 'Str',
-    default => '../mashonisa.db',
+    default => 'share/mashonisa-schema.db',
 );
 
 has dsn => (
