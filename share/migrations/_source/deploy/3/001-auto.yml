@@ -1,0 +1,464 @@
+---
+schema:
+  procedures: {}
+  tables:
+    agent:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - name
+          match_type: ''
+          name: agent_name
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 1
+          expression: ''
+          fields:
+            - interest_rate_id
+          match_type: ''
+          name: agent_fk_interest_rate_id
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields:
+            - id
+          reference_table: interest_rate
+          type: FOREIGN KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        interest_rate_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: interest_rate_id
+          order: 3
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: name
+          order: 2
+          size:
+            - 0
+      indices:
+        - fields:
+            - interest_rate_id
+          name: agent_idx_interest_rate_id
+          options: []
+          type: NORMAL
+      name: agent
+      options: []
+      order: 1
+    client:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - name
+          match_type: ''
+          name: client_name
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 1
+          expression: ''
+          fields:
+            - agent_id
+          match_type: ''
+          name: client_fk_agent_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: agent
+          type: FOREIGN KEY
+      fields:
+        agent_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: agent_id
+          order: 2
+          size:
+            - 0
+        created_at:
+          data_type: ''
+          default_value: !!perl/ref
+            =: CURRENT_TIMESTAMP
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: created_at
+          order: 4
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: name
+          order: 3
+          size:
+            - 0
+      indices:
+        - fields:
+            - agent_id
+          name: client_idx_agent_id
+          options: []
+          type: NORMAL
+      name: client
+      options: []
+      order: 3
+    interest_rate:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: interest_rate_fk_id
+          on_delete: CASCADE
+          on_update: ''
+          options: []
+          reference_fields:
+            - interest_rate_id
+          reference_table: agent
+          type: FOREIGN KEY
+      fields:
+        amount:
+          data_type: decimal
+          default_value: 1.4
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: amount
+          order: 2
+          size:
+            - 9
+            - 2
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+      indices: []
+      name: interest_rate
+      options: []
+      order: 2
+    loan:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - client_id
+          match_type: ''
+          name: loan_fk_client_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: client
+          type: FOREIGN KEY
+      fields:
+        amount_borrowed:
+          data_type: decimal
+          default_value: 0
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: amount_borrowed
+          order: 3
+          size:
+            - 9
+            - 2
+        client_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: client_id
+          order: 2
+          size:
+            - 0
+        created_at:
+          data_type: ''
+          default_value: !!perl/ref
+            =: CURRENT_TIMESTAMP
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: created_at
+          order: 6
+          size:
+            - 0
+        date_borrowed:
+          data_type: ''
+          default_value: !!perl/ref
+            =: CURRENT_DATE
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: date_borrowed
+          order: 5
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        loan_status:
+          data_type: text
+          default_value: active
+          extra:
+            check: "loan_status IN ('active', 'paid')"
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: loan_status
+          order: 4
+          size:
+            - 0
+        updated_at:
+          data_type: ''
+          default_value: !!perl/ref
+            =: CURRENT_TIMESTAMP
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: updated_at
+          order: 7
+          size:
+            - 0
+      indices:
+        - fields:
+            - client_id
+          name: loan_idx_client_id
+          options: []
+          type: NORMAL
+      name: loan
+      options: []
+      order: 4
+    loan_repayment:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - loan_id
+          match_type: ''
+          name: loan_repayment_fk_loan_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: loan
+          type: FOREIGN KEY
+      fields:
+        amount_paid:
+          data_type: decimal
+          default_value: 0
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: amount_paid
+          order: 3
+          size:
+            - 9
+            - 2
+        created_at:
+          data_type: ''
+          default_value: !!perl/ref
+            =: CURRENT_TIMESTAMP
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: created_at
+          order: 5
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        loan_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: loan_id
+          order: 2
+          size:
+            - 0
+        payment_date:
+          data_type: ''
+          default_value: !!perl/ref
+            =: CURRENT_DATE
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: payment_date
+          order: 4
+          size:
+            - 0
+        updated_at:
+          data_type: ''
+          default_value: !!perl/ref
+            =: CURRENT_TIMESTAMP
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: updated_at
+          order: 6
+          size:
+            - 0
+      indices:
+        - fields:
+            - loan_id
+          name: loan_repayment_idx_loan_id
+          options: []
+          type: NORMAL
+      name: loan_repayment
+      options: []
+      order: 5
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: ~
+  no_comments: 0
+  parser_args:
+    sources:
+      - Agent
+      - Client
+      - InterestRate
+      - Loan
+      - LoanRepayment
+  parser_type: SQL::Translator::Parser::DBIx::Class
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 1.66
