@@ -2,7 +2,7 @@ package Mashonisa::DB;
 
 use strict;
 use warnings;
-use experimental qw/ say signatures /;
+use experimental qw/ signatures /;
 
 use DBI;
 use Mouse;
