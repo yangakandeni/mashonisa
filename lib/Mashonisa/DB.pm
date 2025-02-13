@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use experimental qw/ signatures /;
 
-use DBI;
 use Mouse;
 use lib 'lib';
+
+use Mashonisa::Schema;
 
 has driver => (
     is => 'ro',
@@ -38,7 +39,6 @@ has schema => (
     lazy => 1,
     default => sub ($self) {
 
-        require Mashonisa::Schema;
         return Mashonisa::Schema->connect($self->dsn, "", "", { RaiseError => 1 })
     }
 );
