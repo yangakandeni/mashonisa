@@ -34,6 +34,11 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
 
+__PACKAGE__->has_many(
+    'loans' => 'Mashonisa::Schema::Result::Loan',
+    { 'foreign.client_id' => 'self.id' },
+);
+
 __PACKAGE__->belongs_to(
     'agent' => 'Mashonisa::Schema::Result::Agent',
     { 'foreign.id' => 'self.agent_id' },
