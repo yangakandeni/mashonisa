@@ -10,8 +10,6 @@ use lib 'lib';
 use Syntax::Keyword::Try;
 use experimental qw/ signatures say /;
 
-use Mashonisa::DB;
-
 sub main_menu ($self) {
     return qq/
     1. Add Agent
