@@ -34,6 +34,7 @@ sub main_menu ($self) {
     18. View Active Loans for a Client
     19. View Client Balance
     20. Exit
+    99. Go Back to Main Menu
     /;
 }
 

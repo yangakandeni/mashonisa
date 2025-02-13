@@ -44,6 +44,9 @@ sub run_app {
             say "Bye!\n";
             last;
         }
+            elsif ( $selection == 99 ) {
+                display_menu_options();
+            }
         else {
             say "Invalid choice, try again!\n";
         }
