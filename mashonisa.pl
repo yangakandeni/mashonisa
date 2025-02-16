@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Syntax::Keyword::Try;
 use experimental qw/ say signatures /;
 
 use lib 'lib';
@@ -16,6 +17,8 @@ sub run_app {
     display_menu_options();
 
     while (1) {
+        try {
+
         my $selection = get_selected_option();
         if ($selection == 1) {
             print "Enter agent name: ";
@@ -48,7 +51,11 @@ sub run_app {
                 display_menu_options();
             }
         else {
-            say "Invalid choice, try again!\n";
+                die "Invalid choice, try again!";
+            }
+        } catch ($error) {
+            say "$error";
+            return 0;
         }
     }
 
