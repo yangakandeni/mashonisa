@@ -15,7 +15,7 @@ has driver => (
     default => 'SQLite',
 );
 
-has database_file => (
+has database => (
     is => 'ro',
     isa => 'Str',
     default => 'share/mashonisa-schema.db',
@@ -28,8 +28,8 @@ has dsn => (
     default => sub ($self) {
 
         my $driver = $self->driver;
-        my $database = $self->database_file;
-        return "DBI:$driver:dbname=$database";
+        my $database = $self->database;
+        return "dbi:$driver:dbname=$database";
     }
 );
 
@@ -38,47 +38,8 @@ has schema => (
     isa => 'Mashonisa::Schema',
     lazy => 1,
     default => sub ($self) {
-
-        return Mashonisa::Schema->connect($self->dsn, "", "", { RaiseError => 1 })
+        return Mashonisa::Schema->connect($self->dsn);
     }
 );
 
-# sub schema ($self) {
-
-#     # Connect to the database without username/password for SQLite
-#     my $dbh = Mashonisa::Schema->connect($self->dsn, "", "", { RaiseError => 1 }) or die $DBI::errstr;
-
-#     say "Opened database successfully";
-
-#     return $dbh;
-# }
-
-# # sub disconnect ($self,$dbh) {
-
-# #     if (defined($dbh)) {
-
-# #         # Commit any pending transactions if AutoCommit is off
-# #         if (!$dbh->{AutoCommit}) {
-# #             eval {
-# #                 # Try committing; ignore errors since we're about to disconnect anyway.
-# #                 local ($@);
-# #                 $dbh->commit();
-# #             };
-# #         }
-
-# #         # Disconnect from the database
-# #         eval {
-# #             local ($@);
-# #             undef($dbh);  # Disconnects when handle goes out of scope.
-# #         };
-
-# #         return 1;
-
-# #     } else {
-# #         return 0;
-# #     }
-
-# #     return undef;
-# # }
-
-1;
+__PACKAGE__->meta->make_immutable;
