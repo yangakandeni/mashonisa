@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
-__PACKAGE__->load_components('InflateColumn::DateTime', 'ResultSet::HashRef');
+__PACKAGE__->load_components('InflateColumn::DateTime');
 
 __PACKAGE__->table('loan');
 
