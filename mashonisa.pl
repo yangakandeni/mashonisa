@@ -67,6 +67,7 @@ sub run_app {
 
 }
 
+# TODO: Rename this parameter to $Agent for all subs
 sub _create_agent( $MashonisaAgent ) {
 
     # TODO: handle when no name is given
