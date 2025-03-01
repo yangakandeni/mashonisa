@@ -19,7 +19,7 @@ __PACKAGE__->add_columns(
         data_type => 'decimal',
         is_nullable => 0,
         is_numeric => 1,
-        size => [ 9, 2 ],
+        size => [ 1, 2 ],
         default_value => 0.4,
     },
 );

@@ -25,6 +25,13 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
         is_unique => 1,
     },
+    interest_rate => {
+        data_type => 'decimal',
+        is_nullable => 1,
+        is_numeric => 1,
+        size => [ 1, 2 ],
+        default_value => undef,
+    },
     created_at => {
         type => 'datetime',
         default_value => \'CURRENT_TIMESTAMP',
