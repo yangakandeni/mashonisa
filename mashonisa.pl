@@ -282,12 +282,26 @@ sub _format_display( $loans, $agent_id, $Strptime ) {
             push @{ $loans_per_client{ $loan->{client_name} } }, $loan;
     }
 
-    print "\nEnter the number for the agent you want to DELETE: ";
-    chomp(my $chosen_agent = <STDIN>);
-    my $ChosenAgent = $agents[$chosen_agent - 1];
+        foreach my $client_name ( keys %loans_per_client ) {
 
-    $MashonisaAgent->delete_agent($ChosenAgent->name);
-    say "\nSuccessfully deleted agent '". $ChosenAgent->name ."' from database";
+            say "\n\t\t". uc $client_name ."\n";
+
+            my $total_borrowed_amount = 0;
+            foreach my $client_loan ( $loans_per_client{ $client_name }->@* ) {
+
+                my $borrowed_amount = $client_loan->{amount_borrowed};
+                my $DateBorrowedDT = $Strptime->parse_datetime($client_loan->{date_borrowed});
+
+                printf "Loan\t\t\tR %.2f\n", $borrowed_amount;
+                printf "Date\t\t\t%02d %s %d\n", $DateBorrowedDT->day, $DateBorrowedDT->month_name, $DateBorrowedDT->year;
+                print "\n";
+
+                $total_borrowed_amount += $borrowed_amount;
+            }
+
+            _display_loan_balances( $client_name, $agent_id, $month_and_year  );
+        }
+    }
 }
 
 sub display_greeting_msg {
