@@ -166,7 +166,7 @@ sub _display_agents( $MashonisaAgent ) {
     my @agents = $MashonisaAgent->find_agents($name);
     if ( ! @agents ) {
         say "\nNo agents found" . ( $name ? " with name '$name'.\n" : ".\n" );
-        next;
+        return undef;
     }
 
     foreach my $Agent ( @agents ) {
