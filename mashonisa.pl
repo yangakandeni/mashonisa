@@ -280,7 +280,7 @@ sub _format_display( $loans, $agent_id, $Strptime ) {
         my %loans_per_client;
         foreach my $loan ( @{ $loans->{ $month_and_year } } ) {
             push @{ $loans_per_client{ $loan->{client_name} } }, $loan;
-    }
+        }
 
         foreach my $client_name ( keys %loans_per_client ) {
 
@@ -345,8 +345,9 @@ sub _calculate_current_loan_period ( $loan_period ) {
 }
 
 sub _maybe_convert_to_decimal_number ($number) {
+
     try {
-       $number && $number =~ m/(0\.)\d+/ ? $number : $number / 100
+        return $number && $number =~ m/(0\.)\d+/ ? $number : $number / 100;
     } catch( $error ) {
         die $error;
     };
