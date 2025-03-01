@@ -216,48 +216,29 @@ sub _display_loans( $MashonisaAgent ) {
 # TODO: Refactor duplicate code in _display_agents, _update_agents, _delete_agents
 sub _update_agents( $MashonisaAgent ) {
 
-    print "\nEnter the name of the agent to UPDATE: ";
-    chomp(my $name = <STDIN>);
+    my @agents = _prompt_to_find_loan_agents( $MashonisaAgent );
+    my $ChosenLoanAgent = _prompt_to_choose_loan_agent( \@agents );
 
-    my @agents = $MashonisaAgent->find_agents($name);
-    if ( ! @agents ) {
-        say "\nNo agents found" . ( $name ? " with name '$name'.\n" : ".\n" );
-        next;
-    }
-
-    say "\nWe found ". scalar @agents ." agents";
-    my $count = 1;
-    foreach my $Agent ( @agents ) {
-        say "\nAgent ($count) - ". $Agent->name;
-        $count++;
-    }
-
-    print "\nEnter the number for the agent you want to UPDATE: ";
-    chomp(my $chosen_agent = <STDIN>);
-    # TODO: Handle invalid number choice
-    # also handle when entered a number greater than length of the list
-    my $ChosenAgent = $agents[$chosen_agent - 1];
-
-    print "\nEnter the NEW name for agent '". $ChosenAgent->name ."' OR skip: ";
+    print "\nEnter the NEW name for agent '". $ChosenLoanAgent->name ."' OR skip: ";
     chomp(my $new_name = <STDIN>);
 
     print "\nChange the current interest rate of '"
-        . ( $ChosenAgent->interest_rate->amount * 100 ) ."%'"
-        . " for '". $ChosenAgent->name ."' OR skip: "
+        . ( $ChosenLoanAgent->interest_rate->amount * 100 ) ."%'"
+        . " for '". $ChosenLoanAgent->name ."' OR skip: "
     ;
     chomp(my $new_interest_rate = <STDIN>);
 
     $new_interest_rate = _maybe_convert_to_decimal_number($new_interest_rate);
     $MashonisaAgent->update_agent(
-        $ChosenAgent->name,
+        $ChosenLoanAgent->name,
         $new_name,
         $new_interest_rate
     );
 
     print "\n";
-    say "Successfully changed agent name from '". $ChosenAgent->name ."' to - '" . $new_name ."'.\n" if $new_name;
+    say "Successfully changed agent name from '". $ChosenLoanAgent->name ."' to - '" . $new_name ."'.\n" if $new_name;
     say "Successfully changed the interest_rate from '"
-        . ( $ChosenAgent->interest_rate->amount * 100 )
+        . ( $ChosenLoanAgent->interest_rate->amount * 100 )
         ."%' to - '" . ( $new_interest_rate * 100 )
         ."%'.\n"
     if $new_interest_rate;
@@ -265,20 +246,40 @@ sub _update_agents( $MashonisaAgent ) {
 }
 
 sub _delete_agents( $MashonisaAgent ) {
-    print "\nEnter the name of the agent you want to DELETE: ";
-    chomp(my $name = <STDIN>);
 
-    my @agents = $MashonisaAgent->find_agents($name);
-    if ( ! @agents ) {
-        say "\nNo agents found" . ( $name ? " with name '$name'.\n" : ".\n" );
-        next;
-    }
+    my @agents = _prompt_to_find_loan_agents( $MashonisaAgent );
+    my $ChosenLoanAgent = _prompt_to_choose_loan_agent( \@agents );
 
-    say "\nWe found ". scalar @agents ." agents";
-    my $count = 1;
-    foreach my $Agent ( @agents ) {
-        say "\nAgent ($count) - ". $Agent->name;
-        $count++;
+    $MashonisaAgent->delete_agent($ChosenLoanAgent->name);
+    say "\nSuccessfully deleted agent '". $ChosenLoanAgent->name ."' from database\n";
+}
+
+sub _add_loan_repayments( $AgentModel, $repayment_amount ) {
+
+    my @agents = _prompt_to_find_loan_agents( $AgentModel );
+    my $ChosenLoanAgent = _prompt_to_choose_loan_agent( \@agents );
+
+    print "\nEnter the client name: ";
+    chomp(my $client_name = <STDIN>);
+
+    die '$client_name is required' unless $client_name;
+    my @active_loans = _prompt_to_find_loans( $ChosenLoanAgent, $client_name, 'active');
+
+
+}
+
+# TODO: Revisit this logic, too many forloops
+sub _format_display( $loans, $agent_id, $Strptime ) {
+
+    foreach my $month_and_year ( keys %$loans ) {
+
+        print("\n" ."* " x 23 ."\n");
+        printf("\n\t\t" . uc $month_and_year ."\n");
+        print("\n" ."* " x 23 ."\n");
+
+        my %loans_per_client;
+        foreach my $loan ( @{ $loans->{ $month_and_year } } ) {
+            push @{ $loans_per_client{ $loan->{client_name} } }, $loan;
     }
 
     print "\nEnter the number for the agent you want to DELETE: ";
@@ -336,5 +337,60 @@ sub _maybe_convert_to_decimal_number ($number) {
         die $error;
     };
 }
+
+sub _prompt_to_find_loan_agents( $AgentModel ) {
+
+    # TODO: handle when no name is given
+    print "\nEnter agent name: ";
+    chomp(my $agent_name = <STDIN>);
+
+    my @agents = $AgentModel->find_agents($agent_name);
+    if ( ! @agents ) {
+        say "\nNo agents found" . ( $agent_name ? " with name '$agent_name'.\n" : ".\n" );
+        return ();
+    }
+
+    # FIXME: refactor this please!!!
+    say "\nWe found ". scalar @agents ." agents";
+    return @agents;
+}
+
+sub _prompt_to_find_loans( $ChosenLoanAgent, $client_name, $loan_status ) {
+
+    if ( !$client_name ) {
+        print "\nEnter a client name OR skip to display all active loans: ";
+        chomp($client_name = <STDIN>);
+    }
+
+    my @loans = Mashonisa::Model::Loan
+        ->new
+        ->find_loans( $ChosenLoanAgent->id, $client_name, $loan_status )
+    ;
+
+    return @loans;
+}
+
+sub _prompt_to_choose_loan_agent( $agents ) {
+
+    return undef unless @$agents;
+
+    my $count = 1;
+    foreach my $Agent ( @$agents ) {
+        say "\nAgent ($count) - ". $Agent->name;
+        $count++;
+    }
+
+    print "\nChoose an agent from above (i.e. enter agent number): ";
+    chomp(my $agent_selection = <STDIN>);
+
+    # TODO: Handle invalid number choice
+    # also handle when entered a number greater than length of the list
+    my $ChosenAgent = $agents->[$agent_selection - 1];
+
+    return $ChosenAgent;
+
+}
+
+sub _init_strptime ($format) { DateTime::Format::Strptime->new(pattern => $format // "%Y-%m-%d") }
 
 1;
