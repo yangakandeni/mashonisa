@@ -55,7 +55,6 @@ sub find_agents ($self, $agent_name ) {
         my $Schema = $self->db->schema;
         my $TXNScopeGuard = $Schema->txn_scope_guard;
 
-        # $Schema->storage->debug(1);
         my @agents = $Schema->resultset('Agent')
             ->search_rs({ $agent_name ? ( name => { -like => "%". $agent_name ."%" } ) : () })
             ->all
