@@ -37,7 +37,7 @@ sub by_client_name ($self, $client_name){
 sub by_status ($self, $loan_status){
 
     return $self unless $loan_status;
-    my $alias = $self->current_resource_alias;
+    my $alias = $self->current_source_alias;
 
     return $self->search_rs({ "$alias.loan_status" => $loan_status });
 }
