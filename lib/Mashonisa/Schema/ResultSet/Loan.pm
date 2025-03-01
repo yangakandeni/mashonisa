@@ -42,4 +42,16 @@ sub by_status ($self, $loan_status){
     return $self->search_rs({ "$alias.loan_status" => $loan_status });
 }
 
+sub by_loan_period ($self, $start_date, $end_date ) {
+
+    return $self unless $start_date && $end_date;
+    my $alias = $self->current_source_alias;
+
+    return $self->search_rs(
+        {
+            "$alias.date_borrowed" => { -between => [$start_date, $end_date] }
+        }
+    );
+}
+
 1;

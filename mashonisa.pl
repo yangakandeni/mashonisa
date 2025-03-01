@@ -6,8 +6,12 @@ use Syntax::Keyword::Try;
 use experimental qw/ say signatures /;
 
 use lib 'lib';
+use DateTime;
 use Mashonisa;
+use Mashonisa::Model::Loan;
 use Mashonisa::Model::Agent;
+use Mashonisa::Model::Client;
+use DateTime::Format::Strptime;
 
 run_app();
 
@@ -29,8 +33,8 @@ sub run_app {
             elsif ($selection == 2) { _display_agents( $MashonisaAgent ) }
             elsif ($selection == 3) { _update_agents( $MashonisaAgent ) }
             elsif ($selection == 4) { _delete_agents( $MashonisaAgent ) }
-            # elsif ($selection == 5) { Mashonisa->add_client(); }
-            # elsif ($selection == 6) { Mashonisa->view_clients(); }
+            elsif ($selection == 5) { _create_loans( $MashonisaAgent ) }
+            elsif ($selection == 6) { _display_loans( $MashonisaAgent ) }
             # elsif ($selection == 7) { Mashonisa->update_client(); }
             # elsif ($selection == 8) { Mashonisa->delete_client(); }
             # elsif ($selection == 9) { Mashonisa->add_loan(); }
@@ -79,6 +83,80 @@ sub _create_agent( $MashonisaAgent ) {
     say "\nSuccessfully added Agent - '". $AgentRS->name ."' - with ". ($AgentRS->interest_rate->amount * 100) ."% interest rate.\n";
 }
 
+sub _create_loans( $MashonisaAgent ) {
+    # TODO: Figure out a more elegant way to do this
+    my $Strptime = _init_strptime(undef);
+    my @agents = _prompt_to_find_loan_agents( $MashonisaAgent );
+
+    if ( !@agents ) {
+        say "Cannot create loans since there's no agent found.\n";
+        return undef;
+    }
+
+    my $ChosenLoanAgent = _prompt_to_choose_loan_agent( \@agents );
+
+    my @loans;
+    my $client_name;
+    my $loan_amount;
+    while(1) {
+
+        print "\nEnter the client name: " unless $client_name;
+        chomp($client_name = <STDIN>) unless $client_name;
+
+        if ( !$client_name ) {
+            say "\nThe client name is required";
+            next;
+        }
+
+        print "\nEnter the amount borrowed: " unless $loan_amount;
+        chomp($loan_amount = <STDIN>) unless $loan_amount;
+
+        if ( !$loan_amount ) {
+            say "\nThe loan amount is required";
+            next;
+        }
+
+        print "\nEnter the date borrowed in (YYYY-MM-DD) format: ";
+        chomp(my $date_borrowed = <STDIN>);
+        $date_borrowed = DateTime->now->ymd unless $date_borrowed;
+
+        print "\nEnter the client interest rate OR skip to use agent interest rate: ";
+        chomp(my $client_interest_rate = <STDIN>);
+        $client_interest_rate = _maybe_convert_to_decimal_number( $client_interest_rate ) if $client_interest_rate;
+
+        push @loans, {
+            client_name => $client_name,
+            date_borrowed => $date_borrowed,
+            amount_borrowed => $loan_amount,
+            client_interest_rate => $client_interest_rate ne '' ? $client_interest_rate + 0 : '',
+        };
+
+        printf("\n%s borrowed R %.2f - DATE: %s\n", ucfirst($client_name), $loan_amount, $date_borrowed);
+
+        # reset loan_amount and client_name
+        $loan_amount = '';
+        $client_name = '';
+
+        print "\nType q to quit OR add another loan: ";
+        chomp(my $exit_code = <STDIN>);
+
+        last if $exit_code && $exit_code eq 'q';
+    }
+
+    if ( ! @loans ) {
+        say "\nNo loans to create.";
+        return undef;
+    } else {
+
+        my @loans_created = Mashonisa::Model::Loan
+            ->new
+            ->create_loans( \@loans, $ChosenLoanAgent->id)
+        ;
+
+        say "\nSuccessfully added ". scalar @loans_created ." loans - for agent '". $ChosenLoanAgent->name ."'\n";
+    }
+}
+
 sub _display_agents( $MashonisaAgent ) {
 
     print "\nEnter agent name or skip to view all agents: ";
@@ -96,6 +174,42 @@ sub _display_agents( $MashonisaAgent ) {
     }
 
     print "\n";
+}
+
+sub _display_loans( $MashonisaAgent ) {
+
+    my @agents = _prompt_to_find_loan_agents( $MashonisaAgent );
+
+    if ( !@agents ) {
+        say "No loans to display since there are no agents on the database.\n";
+        return undef;
+    }
+
+    my $ChosenLoanAgent = _prompt_to_choose_loan_agent( \@agents );
+    my @active_loans = _prompt_to_find_loans( $ChosenLoanAgent, undef, 'active');
+
+    if ( !@active_loans ) {
+        say "\nNo active loans found.\n";
+        return undef;
+    }
+
+    my %loans_to_display;
+    my $Strptime = _init_strptime(undef);
+
+    foreach my $Loan ( @active_loans ) {
+
+        my $DateBorrowedDT = $Strptime->parse_datetime($Loan->date_borrowed);
+        my $month_and_year = sprintf "%s %d", $DateBorrowedDT->month_name, $DateBorrowedDT->year;
+
+        push @{ $loans_to_display{ $month_and_year } }, +{
+            client_name => $Loan->client->name,
+            date_borrowed => $Loan->date_borrowed,
+            amount_borrowed => $Loan->amount_borrowed,
+        };
+    }
+
+    return _format_display( \%loans_to_display, $ChosenLoanAgent->id, $Strptime );
+
 }
 
 # TODO: Refactor duplicate code in _display_agents, _update_agents, _delete_agents
@@ -192,6 +306,26 @@ sub get_selected_option {
     print "Choose an option: ";
     chomp(my $selection = <STDIN>);
     return $selection;
+}
+
+sub _display_loan_balances ( $client_name, $agent_id, $loan_period ) {
+
+    say "\n". "-" x 44;
+    my $Client = Mashonisa::Model::Client->new( name => $client_name );
+    my ( $start_date, $end_date ) = _calculate_current_loan_period( $loan_period );
+    printf "\nLoan Total\t\tR %.2f\n", $Client->get_total_amount_borrowed( $agent_id, $start_date, $end_date );
+    printf "Amount Due\t\tR %.2f %s", $Client->get_total_amount_due( $agent_id, $start_date, $end_date ), "<==";
+    say "\n". "-" x 44;
+
+}
+
+sub _calculate_current_loan_period ( $loan_period ) {
+
+    my $Strptime = _init_strptime("%B %Y");
+    my $LoanPeriodDT = $Strptime->parse_datetime($loan_period);
+    my $end_date = $LoanPeriodDT->clone->set_day( $LoanPeriodDT->month_length );
+
+    return ( $LoanPeriodDT->ymd, $end_date->ymd );
 }
 
 sub _maybe_convert_to_decimal_number ($number) {

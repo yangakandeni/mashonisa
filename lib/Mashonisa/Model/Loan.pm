@@ -12,7 +12,7 @@ use experimental qw/ signatures say /;
 
 # TODO: These CRUD methods should be able to handle bulk operations
 # TODO: Maybe these methods belong in the ClientModel?
-sub create_loans ($self, $loans, $agent_id, $interest_rate_override) {
+sub create_loans ($self, $loans, $agent_id) {
 
     try {
 
@@ -21,14 +21,21 @@ sub create_loans ($self, $loans, $agent_id, $interest_rate_override) {
 
         my $Schema = $self->db->schema;
         my $TXNScopeGuard = $Schema->txn_scope_guard;
-
-        $Schema->storage->debug;
+        my $AgentResult = $Schema->resultset('Agent')->find({ id => $agent_id });
 
         my @created_loans;
         foreach my $loan ( @$loans ) {
+
+            my $client_interest_rate = $loan->{client_interest_rate} ne '' && $loan->{client_interest_rate} >= 0
+                ? $loan->{client_interest_rate}
+                : undef
+            ;
+
             my $ClientRS = $Schema->resultset('Client')
                 ->find_or_create({ name => $loan->{client_name}, agent_id => $agent_id })
             ;
+
+            $ClientRS->update({ interest_rate => $client_interest_rate }) if defined $client_interest_rate;
 
             my $LoanRS = $Schema->resultset('Loan')
                 ->create({
@@ -38,32 +45,8 @@ sub create_loans ($self, $loans, $agent_id, $interest_rate_override) {
                 })
             ;
 
-            # TODO: Figure out a way to do this better, maybe via OOP?
-            my $LoanBalanceRS = $Schema->resultset('LoanBalance')
-                ->find_or_create({ client_id => $ClientRS->id, agent_id => $agent_id  })
-            ;
-
-            $LoanBalanceRS->update({
-                ( $interest_rate_override ? ( interest_rate_override => $interest_rate_override ) : () ),
-                total_amount_borrowed => ( $LoanBalanceRS->total_amount_borrowed + $LoanRS->amount_borrowed ),
-            });
-            # TODO end
-
             push @created_loans, $LoanRS;
         }
-
-        my $AgentResult = $Schema->resultset('Agent')->find({ id => $agent_id })
-        my $interest_rate = $interest_rate_override ? $interest_rate_override : $Agent->interest_rate->amount;
-
-        # TODO: Figure out a way to do this better, maybe via OOP?
-        my $LoanBalanceRS = $Schema->resultset('LoanBalance')
-            ->find({ client_id => $ClientRS->id, agent_id => $agent_id  })
-        ;
-
-        $LoanBalanceRS->update({
-            total_amount_due => ( $LoanBalanceRS->total_amount_borrowed * ( 1 + $interest_rate ) ),
-        });
-        # TODO end
 
         $TXNScopeGuard->commit;
 
@@ -81,7 +64,6 @@ sub find_loans ($self, $agent_id, $client_name, $loan_status ) {
         my $Schema = $self->db->schema;
         my $TXNScopeGuard = $Schema->txn_scope_guard;
 
-        # $Schema->storage->debug(1);
         my @loans = $Schema->resultset('Loan')
             ->by_agent( $agent_id )
             ->by_status( $loan_status )
@@ -98,15 +80,16 @@ sub find_loans ($self, $agent_id, $client_name, $loan_status ) {
     }
 }
 
-sub get_client_balance ( $self, $agent_id, $client_name ) {
+sub get_client_balance ( $class, $agent_id, $client_name ) {
 
     try {
+        my $self = $class->new;
+        my $Schema = $self->db->schema;
         my $TXNScopeGuard = $Schema->txn_scope_guard;
 
-        # $Schema->storage->debug(1);
         my $ClientBalanceResult = $Schema->resultset('LoanBalance')
             ->by_agent( $agent_id )
-            ->client_name( $client_name )
+            ->by_client_name( $client_name )
             ->single
         ;
 
